@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Monty Hall Simulation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 { margin-bottom: 10px; }
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #38bdf8;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0ea5e9;
+    }
+    .results {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Monty Hall Simulation</h1>
+  <div class="card">
+    <p>Number of trials:</p>
+    <input type="number" id="trials" value="10000" min="1" />
+
+    <br>
+
+    <button onclick="runSimulation()">Run Simulation</button>
+
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    function runTrial(switchChoice) {
+      // doors: 0, 1, 2
+      const prize = Math.floor(Math.random() * 3);
+      const choice = Math.floor(Math.random() * 3);
+
+      // host reveals a goat door
+      let reveal;
+      do {
+        reveal = Math.floor(Math.random() * 3);
+      } while (reveal === prize || reveal === choice);
+
+      if (switchChoice) {
+        // switch to the only remaining unopened door
+        for (let i = 0; i < 3; i++) {
+          if (i !== choice && i !== reveal) {
+            return i === prize;
+          }
+        }
+      } else {
+        // stay
+        return choice === prize;
+      }
+    }
+
+    function simulate(trials, switchChoice) {
+      let wins = 0;
+      for (let i = 0; i < trials; i++) {
+        if (runTrial(switchChoice)) wins++;
+      }
+      return wins;
+    }
+
+    function runSimulation() {
+      const trials = parseInt(document.getElementById("trials").value);
+
+      const stayWins = simulate(trials, false);
+      const switchWins = simulate(trials, true);
+
+      const stayRate = (stayWins / trials * 100).toFixed(2);
+      const switchRate = (switchWins / trials * 100).toFixed(2);
+
+      document.getElementById("results").innerHTML = `
+        <p><strong>Stay Strategy:</strong> ${stayWins} wins (${stayRate}%)</p>
+        <p><strong>Switch Strategy:</strong> ${switchWins} wins (${switchRate}%)</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
